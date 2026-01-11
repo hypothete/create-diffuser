@@ -1,4 +1,4 @@
-package com.eriskallisti.diffuser;
+package com.hypothete.diffuser;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;

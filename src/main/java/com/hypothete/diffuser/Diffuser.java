@@ -1,4 +1,4 @@
-package com.eriskallisti.diffuser;
+package com.hypothete.diffuser;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
