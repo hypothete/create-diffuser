@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import com.hypothete.diffuser.Diffuser;
 import com.hypothete.diffuser.items.ModItems;
+import com.simibubi.create.foundation.block.WrenchableDirectionalBlock;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -19,8 +20,8 @@ import net.minecraftforge.registries.RegistryObject;
 public class ModBlocks {
   public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Diffuser.MODID);
 
-  public static final RegistryObject<Block> DIFFUSER_BLOCK = registerBlock("diffuser", () -> new Block(
-      BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GREEN).strength(0.5F).sound(SoundType.LANTERN)));
+  public static final RegistryObject<Block> DIFFUSER_BLOCK = registerBlock("diffuser", () -> new DiffuserBlock(
+      BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_GREEN).strength(0.5F).sound(SoundType.LANTERN).noOcclusion()));
 
   private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
     RegistryObject<T> toReturn = BLOCKS.register(name, block);
