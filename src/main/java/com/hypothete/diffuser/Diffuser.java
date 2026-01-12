@@ -1,9 +1,11 @@
 package com.hypothete.diffuser;
 
 import com.hypothete.diffuser.blocks.ModBlocks;
+import com.hypothete.diffuser.entities.ModBlockEntities;
 import com.hypothete.diffuser.items.ModCreativeModeTabs;
-import com.hypothete.diffuser.items.ModItems;
 import com.mojang.logging.LogUtils;
+import com.tterrag.registrate.Registrate;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
@@ -17,6 +19,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
+
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -27,15 +30,17 @@ public class Diffuser {
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    public static final Registrate REGISTRATE = Registrate.create(Diffuser.MODID);
+
     public Diffuser(FMLJavaModLoadingContext context) {
         IEventBus modEventBus = context.getModEventBus();
 
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
-        ModItems.register(modEventBus);
-        ModBlocks.register(modEventBus);
+        ModBlocks.register();
         ModCreativeModeTabs.register(modEventBus);
+        ModBlockEntities.register();
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
