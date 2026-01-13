@@ -1,3 +1,12 @@
+# Create Diffuser Block
+
+![Picture of a machine with two diffusers](./screenshots/action-shot.png)
+
+This mod adds a new block to Create called the diffuser. Diffusers take in a fluid from their underside and distribute any effects that the fluid causes in an 8x8x8 area around them. Think of them as a poor man's beacon.
+
+![Picture of the diffuser crafting recipe](./screenshots/crafting.png)
+
+*(resume MDK README text)*
 
 Source installation information for modders
 -------------------------------------------
@@ -25,6 +34,8 @@ If you prefer to use IntelliJ:
 2. Select your build.gradle file and have it import.
 3. Run the following command: `./gradlew genIntellijRuns`
 4. Refresh the Gradle Project in IDEA if required.
+
+__Author's note for the VSCode masochists like herself: `./gradlew genVSCodeRuns` adds runs to the Debug pane__
 
 If at any point you are missing libraries in your IDE, or you've run into problems you can 
 run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
