@@ -20,7 +20,7 @@ public class DiffuserBlock extends Block implements IWrenchable, IBE<DiffuserBlo
     super(properties);
   }
 
-  public static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 12, 16);
+  public static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 12, 15);
 
   @Override
   public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
