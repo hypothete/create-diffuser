@@ -101,7 +101,7 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
     Vec3 offset = VecHelper.offsetRandomly(Vec3.ZERO, r, 1).normalize();
     vec = vec.add(offset.x, 12 / 16f, offset.z);
     ParticleOptions particle = ParticleTypes.POOF;
-    if (r.nextFloat() < 1 / 10f) {
+    if (r.nextFloat() < 1 / 3f) {
       particle = FluidFX.getFluidParticle(fluid);
     }
     level.addAlwaysVisibleParticle(particle, vec.x, vec.y, vec.z, 0, .01f, 0);
