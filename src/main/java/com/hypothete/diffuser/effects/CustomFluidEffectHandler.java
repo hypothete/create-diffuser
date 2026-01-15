@@ -12,7 +12,7 @@ import net.minecraft.world.phys.AABB;
 
 public class CustomFluidEffectHandler {
 
-	public static final int TICKS = 50;
+	public static final int TICKS = 20 * 30;
 	public static final int LEVEL = 0;
 
 	public void apply(Level level, AABB area, FluidEffect fluidEffect) {
