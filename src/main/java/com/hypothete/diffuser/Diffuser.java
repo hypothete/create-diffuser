@@ -1,6 +1,8 @@
 package com.hypothete.diffuser;
 
 import com.hypothete.diffuser.blocks.ModBlocks;
+import com.hypothete.diffuser.data.Datagen;
+import com.hypothete.diffuser.data.FluidEffectManager;
 import com.hypothete.diffuser.entities.ModBlockEntities;
 import com.hypothete.diffuser.items.ModCreativeModeTabs;
 import com.tterrag.registrate.Registrate;
@@ -9,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.level.ExplosionEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -34,6 +37,8 @@ public class Diffuser {
         ModBlocks.register();
         ModBlockEntities.register();
         ModCreativeModeTabs.register(MOD_BUS);
+        FluidEffectManager.register(MOD_BUS);
+        MOD_BUS.addListener(EventPriority.LOWEST, Datagen::gatherData);
 
         // This listener is fired on both client and server during setup.
         MOD_BUS.addListener(this::commonSetup);
