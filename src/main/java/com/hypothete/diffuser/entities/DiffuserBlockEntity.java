@@ -2,6 +2,8 @@ package com.hypothete.diffuser.entities;
 
 import java.util.List;
 
+import com.hypothete.diffuser.data.FluidEffectManager;
+import com.hypothete.diffuser.effects.CustomFluidEffectHandler;
 import com.simibubi.create.api.effect.OpenPipeEffectHandler;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.content.fluids.FluidFX;
@@ -33,6 +35,7 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
   SmartFluidTankBehaviour tank;
   static RandomSource r = RandomSource.create();
   public int processingTicks;
+  private static CustomFluidEffectHandler customEffectHandler = new CustomFluidEffectHandler();
 
   public DiffuserBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
     super(type, pos, state);
@@ -77,31 +80,49 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
       processingTicks--;
     }
 
+    if (processingTicks < 3 && level.isClientSide && !tank.isEmpty()) {
+      spawnDiffusingParticles(tank.getPrimaryTank().getRenderedFluid());
+    }
+
     if (processingTicks == -1) {
       processingTicks = FILLING_TIME;
-      OpenPipeEffectHandler effectHandler = OpenPipeEffectHandler.REGISTRY.get(getCurrentFluidInTank().getFluid());
+      var currentFluid = getCurrentFluidInTank().getFluid();
+      var aoe = getAreaOfEffect();
+
+      // if we have a custom fluidEffect, apply it
+      FluidEffectManager.FLUID_EFFECTS.getEntries().forEach(fluidEffect -> {
+        var feFluid = fluidEffect.get().fluid().get();
+        if (feFluid.equals(currentFluid)) {
+          customEffectHandler.apply(level, aoe, fluidEffect.get());
+          return;
+        }
+      });
+
+      // fall back on open pipe behavior
+      OpenPipeEffectHandler effectHandler = OpenPipeEffectHandler.REGISTRY.get(currentFluid);
       if (effectHandler == null) {
         return;
       }
-      Vec3 center = VecHelper.getCenterOf(worldPosition);
-      Vec3 aa = center.subtract(HALF_AREA_SIZE, HALF_AREA_SIZE, HALF_AREA_SIZE);
-      Vec3 bb = center.add(HALF_AREA_SIZE, HALF_AREA_SIZE, HALF_AREA_SIZE);
-      effectHandler.apply(level, new AABB(aa.x, aa.y, aa.z, bb.x, bb.y, bb.z), getCurrentFluidInTank());
-    }
 
-    if (processingTicks < 3 && level.isClientSide && !tank.isEmpty()) {
-      spawnProcessingParticles(tank.getPrimaryTank().getRenderedFluid());
+      effectHandler.apply(level, aoe, getCurrentFluidInTank());
     }
   }
 
-  protected void spawnProcessingParticles(FluidStack fluid) {
+  protected AABB getAreaOfEffect() {
+    Vec3 center = VecHelper.getCenterOf(worldPosition);
+    Vec3 aa = center.subtract(HALF_AREA_SIZE, HALF_AREA_SIZE, HALF_AREA_SIZE);
+    Vec3 bb = center.add(HALF_AREA_SIZE, HALF_AREA_SIZE, HALF_AREA_SIZE);
+    return new AABB(aa.x, aa.y, aa.z, bb.x, bb.y, bb.z);
+  }
+
+  protected void spawnDiffusingParticles(FluidStack fluid) {
     if (isVirtual() || fluid.isEmpty())
       return;
     Vec3 vec = VecHelper.getCenterOf(worldPosition);
     Vec3 offset = VecHelper.offsetRandomly(Vec3.ZERO, r, 1).normalize();
     vec = vec.add(offset.x, 12 / 16f, offset.z);
     ParticleOptions particle = ParticleTypes.POOF;
-    if (r.nextFloat() < 1 / 10f) {
+    if (r.nextFloat() < 1 / 3f) {
       particle = FluidFX.getFluidParticle(fluid);
     }
     level.addAlwaysVisibleParticle(particle, vec.x, vec.y, vec.z, 0, .01f, 0);

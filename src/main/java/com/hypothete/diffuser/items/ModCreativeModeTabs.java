@@ -12,7 +12,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
 public class ModCreativeModeTabs {
-  public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Diffuser.MODID);
+  public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Diffuser.MOD_ID);
 
   public static final RegistryObject<CreativeModeTab> DIFFUSER_TAB = CREATIVE_MODE_TABS.register("diffuser_tab", () -> CreativeModeTab.builder()
   .title(Component.translatable("creativetab.diffuser.diffuser_tab"))

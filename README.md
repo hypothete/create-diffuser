@@ -35,7 +35,7 @@ If you prefer to use IntelliJ:
 3. Run the following command: `./gradlew genIntellijRuns`
 4. Refresh the Gradle Project in IDEA if required.
 
-__Author's note for the VSCode masochists like herself: `./gradlew genVSCodeRuns` adds runs to the Debug pane__
+__Author's note for the VSCode masochists like herself: `./gradlew genVSCodeRuns` adds runs to the Debug pane or `./gradlew vscode` on the arch loom branch__
 
 If at any point you are missing libraries in your IDE, or you've run into problems you can 
 run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
