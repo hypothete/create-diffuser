@@ -1,7 +1,9 @@
 package com.hypothete.diffuser.entities;
 
 import java.util.List;
+import java.util.Optional;
 
+import com.hypothete.diffuser.data.FluidEffect;
 import com.hypothete.diffuser.data.FluidEffectManager;
 import com.hypothete.diffuser.effects.CustomFluidEffectHandler;
 import com.simibubi.create.api.effect.OpenPipeEffectHandler;
@@ -21,6 +23,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
@@ -90,13 +93,11 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
       var aoe = getAreaOfEffect();
 
       // if we have a custom fluidEffect, apply it
-      FluidEffectManager.FLUID_EFFECTS.getEntries().forEach(fluidEffect -> {
-        var feFluid = fluidEffect.get().fluid().get();
-        if (feFluid.equals(currentFluid)) {
-          customEffectHandler.apply(level, aoe, fluidEffect.get());
-          return;
-        }
-      });
+      var foundFluidEffect = getFluidEffect(currentFluid);
+      if (foundFluidEffect.isPresent()) {
+        customEffectHandler.apply(level, aoe, foundFluidEffect.get());
+        return;
+      }
 
       // fall back on open pipe behavior
       OpenPipeEffectHandler effectHandler = OpenPipeEffectHandler.REGISTRY.get(currentFluid);
@@ -106,6 +107,14 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
       effectHandler.apply(level, aoe, getCurrentFluidInTank());
     }
+  }
+
+  public Optional<FluidEffect> getFluidEffect(Fluid fluid) {
+    return level.registryAccess()
+    .lookupOrThrow(FluidEffectManager.FLUID_EFFECTS_KEY)
+    .listElements()
+    .filter(ref -> ref.value().fluid().equals(fluid))
+    .findFirst().map(ref -> ref.value());
   }
 
   protected AABB getAreaOfEffect() {

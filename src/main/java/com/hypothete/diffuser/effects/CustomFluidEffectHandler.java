@@ -17,7 +17,7 @@ public class CustomFluidEffectHandler {
 
 	public void apply(Level level, AABB area, FluidEffect fluidEffect) {
 		List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, area);
-		MobEffectInstance effectInstance = new MobEffectInstance(fluidEffect.effect().get(), TICKS, LEVEL);
+		MobEffectInstance effectInstance = new MobEffectInstance(fluidEffect.effect(), TICKS, LEVEL);
 		for (LivingEntity entity : entities) {
 			MobEffect effect = effectInstance.getEffect();
 			if (effect.isInstantenous()) {
