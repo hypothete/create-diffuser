@@ -3,6 +3,7 @@ package com.hypothete.diffuser.entities;
 import java.util.List;
 import java.util.Optional;
 
+import com.hypothete.diffuser.blocks.DiffuserBlock;
 import com.hypothete.diffuser.data.FluidEffect;
 import com.hypothete.diffuser.data.FluidEffectManager;
 import com.hypothete.diffuser.effects.CustomFluidEffectHandler;
@@ -47,7 +48,8 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
   @Override
   public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-    if (cap == ForgeCapabilities.FLUID_HANDLER && side == Direction.DOWN) {
+    var facingOut = getBlockState().getValue(DiffuserBlock.FACING).getOpposite();
+    if (cap == ForgeCapabilities.FLUID_HANDLER && side == facingOut) {
       return tank.getCapability().cast();
     }
     return super.getCapability(cap, side);
@@ -111,10 +113,10 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
   public Optional<FluidEffect> getFluidEffect(Fluid fluid) {
     return level.registryAccess()
-    .lookupOrThrow(FluidEffectManager.FLUID_EFFECTS_KEY)
-    .listElements()
-    .filter(ref -> ref.value().fluid().equals(fluid))
-    .findFirst().map(ref -> ref.value());
+        .lookupOrThrow(FluidEffectManager.FLUID_EFFECTS_KEY)
+        .listElements()
+        .filter(ref -> ref.value().fluid().equals(fluid))
+        .findFirst().map(ref -> ref.value());
   }
 
   protected AABB getAreaOfEffect() {

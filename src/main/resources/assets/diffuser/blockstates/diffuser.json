@@ -1,7 +1,30 @@
 {
-   "variants": {
-    "": {
+  "variants": {
+    "facing=down": {
+      "model": "diffuser:block/diffuser",
+      "x": 180
+    },
+    "facing=up": {
       "model": "diffuser:block/diffuser"
+    },
+    "facing=east": {
+      "model": "diffuser:block/diffuser",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "diffuser:block/diffuser",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "diffuser:block/diffuser",
+      "x": 90,
+      "y": 180
+    },
+    "facing=west": {
+      "model": "diffuser:block/diffuser",
+      "x": 90,
+      "y": 270
     }
-   }
+  }
 }

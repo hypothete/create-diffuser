@@ -9,7 +9,13 @@ import net.minecraft.world.level.block.SoundType;
 public class ModBlocks {
 
   public static final BlockEntry<DiffuserBlock> DIFFUSER_BLOCK = Diffuser.REGISTRATE
-      .block("diffuser", DiffuserBlock::new).initialProperties(() -> Blocks.IRON_BLOCK).properties(p -> p.sound(SoundType.LANTERN)).simpleItem().register();
+      .block("diffuser", DiffuserBlock::new)
+      .initialProperties(() -> Blocks.IRON_BLOCK)
+      .properties(p -> p.noOcclusion())
+      .properties(p -> p.sound(SoundType.LANTERN))
+			.blockstate((c, p) -> p.directionalBlock(c.get(), p.models().getExistingFile(p.modLoc("block/diffuser.json"))))
+      .simpleItem()
+      .register();
 
   public static void register() {
   }
