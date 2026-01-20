@@ -16,6 +16,7 @@ import com.simibubi.create.foundation.blockEntity.behaviour.fluid.SmartFluidTank
 import com.simibubi.create.foundation.fluid.FluidHelper;
 
 import net.createmod.catnip.math.VecHelper;
+import net.createmod.catnip.outliner.Outliner;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -49,7 +50,7 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
   @Override
   public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
     var facingOut = getBlockState().getValue(DiffuserBlock.FACING).getOpposite();
-    if (cap == ForgeCapabilities.FLUID_HANDLER && side == facingOut) {
+    if (cap == ForgeCapabilities.FLUID_HANDLER && (side == facingOut || side == null)) {
       return tank.getCapability().cast();
     }
     return super.getCapability(cap, side);
@@ -62,7 +63,7 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
   @Override
   public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
-    behaviours.add(tank = SmartFluidTankBehaviour.single(this, 50)
+    behaviours.add(tank = SmartFluidTankBehaviour.single(this, 25)
         .allowInsertion()
         .forbidExtraction());
   }
@@ -120,27 +121,40 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
   }
 
   protected AABB getAreaOfEffect() {
-    Vec3 center = VecHelper.getCenterOf(worldPosition);
-    Vec3 aa = center.subtract(HALF_AREA_SIZE, HALF_AREA_SIZE, HALF_AREA_SIZE);
-    Vec3 bb = center.add(HALF_AREA_SIZE, HALF_AREA_SIZE, HALF_AREA_SIZE);
-    return new AABB(aa.x, aa.y, aa.z, bb.x, bb.y, bb.z);
+    Direction facing = getBlockState().getValue(DiffuserBlock.FACING);
+    var scaledFacing = facing.step().mul(HALF_AREA_SIZE);
+    return new AABB(worldPosition)
+        .move(scaledFacing.x, scaledFacing.y, scaledFacing.z)
+        .inflate(HALF_AREA_SIZE);
   }
 
   protected void spawnDiffusingParticles(FluidStack fluid) {
     if (isVirtual() || fluid.isEmpty())
       return;
-    Vec3 vec = VecHelper.getCenterOf(worldPosition);
+    
+    Vec3 startPos = VecHelper.getCenterOf(worldPosition);
+    var facing = new Vec3(getBlockState().getValue(DiffuserBlock.FACING).step());
+    startPos = startPos.add(facing.scale(12 /16f)); // block model is 3/4 of a block tall
     Vec3 offset = VecHelper.offsetRandomly(Vec3.ZERO, r, 1).normalize();
-    vec = vec.add(offset.x, 12 / 16f, offset.z);
+    var dot = offset.dot(facing);
     ParticleOptions particle = ParticleTypes.POOF;
     if (r.nextFloat() < 1 / 3f) {
       particle = FluidFX.getFluidParticle(fluid);
     }
-    level.addAlwaysVisibleParticle(particle, vec.x, vec.y, vec.z, 0, .01f, 0);
+    Vec3 particleMotion = offset.scale(dot * 0.5); // slow it down a titch
+    level.addAlwaysVisibleParticle(particle, startPos.x, startPos.y, startPos.z, particleMotion.x, particleMotion.y, particleMotion.z);
+
   }
 
   @Override
   public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+
+    // show area of effect
+    if (isPlayerSneaking) {
+      var aoe = getAreaOfEffect();
+      Outliner.getInstance().showAABB(this, aoe);
+    }
+
     return containedFluidTooltip(tooltip, isPlayerSneaking, tank.getCapability().cast());
   }
 }
