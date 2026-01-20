@@ -32,6 +32,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
 public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggleInformation {
 
@@ -77,12 +78,6 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
   public void tick() {
     super.tick();
     if (processingTicks >= 0) {
-      var currentFluidInTank = getCurrentFluidInTank();
-      var currentAmountInTank = currentFluidInTank.getAmount();
-      if (currentAmountInTank > 0) {
-        tank.getPrimaryHandler()
-            .setFluid(FluidHelper.copyStackWithAmount(currentFluidInTank, currentAmountInTank - 1));
-      }
       processingTicks--;
     }
 
@@ -91,8 +86,8 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     if (processingTicks == -1) {
-      processingTicks = FILLING_TIME;
-      var currentFluid = getCurrentFluidInTank().getFluid();
+      var currentFluidInTank = getCurrentFluidInTank();
+      var currentFluid = currentFluidInTank.getFluid();
       var aoe = getAreaOfEffect();
 
       // if we have a custom fluidEffect, apply it
@@ -108,7 +103,13 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
         return;
       }
 
-      effectHandler.apply(level, aoe, getCurrentFluidInTank());
+      effectHandler.apply(level, aoe, currentFluidInTank);
+
+      if (!tank.isEmpty()) {
+        tank.getPrimaryHandler().drain(5, FluidAction.EXECUTE);
+      }
+
+      processingTicks = FILLING_TIME;
     }
   }
 
