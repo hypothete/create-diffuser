@@ -1,7 +1,7 @@
 package com.hypothete.diffuser.blocks;
 
 import com.hypothete.diffuser.entities.DiffuserBlockEntity;
-import com.hypothete.diffuser.entities.ModBlockEntities;
+import com.hypothete.diffuser.Diffuser;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.block.WrenchableDirectionalBlock;
 
@@ -20,15 +20,15 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class DiffuserBlock extends WrenchableDirectionalBlock implements IBE<DiffuserBlockEntity> {
   public static final VoxelShape baseShape = Block.box(1, 0, 1, 15, 12, 15);
   public static final VoxelShaper shaper = VoxelShaper.forDirectional(baseShape, Direction.UP);
-  
+
   public DiffuserBlock(Properties properties) {
     super(properties);
     registerDefaultState(defaultBlockState());
   }
 
   @Override
-	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
-		return shaper.get(state.getValue(FACING));
+  public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
+    return shaper.get(state.getValue(FACING));
   }
 
   @Override
@@ -44,7 +44,7 @@ public class DiffuserBlock extends WrenchableDirectionalBlock implements IBE<Dif
 
   @Override
   public BlockEntityType<? extends DiffuserBlockEntity> getBlockEntityType() {
-    return ModBlockEntities.DIFFUSER_BE.get();
+    return Diffuser.DIFFUSER_BE.get();
   }
 
   @Override

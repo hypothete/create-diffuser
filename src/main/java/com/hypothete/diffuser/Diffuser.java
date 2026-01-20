@@ -1,10 +1,14 @@
 package com.hypothete.diffuser;
 
-import com.hypothete.diffuser.blocks.ModBlocks;
-import com.hypothete.diffuser.entities.ModBlockEntities;
-import com.hypothete.diffuser.items.ModCreativeModeTabs;
+import com.hypothete.diffuser.blocks.DiffuserBlock;
+import com.hypothete.diffuser.entities.DiffuserBlockEntity;
+import com.hypothete.diffuser.items.CreativeModeTabs;
 import com.tterrag.registrate.Registrate;
+import com.tterrag.registrate.util.entry.BlockEntityEntry;
+import com.tterrag.registrate.util.entry.BlockEntry;
 
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -17,45 +21,27 @@ public class Diffuser {
 
     public static final String MOD_ID = "diffuser";
     public static final Logger LOGGER = LogManager.getLogger();
-
     public static final Registrate REGISTRATE = Registrate.create(MOD_ID);
+
+    public static final BlockEntry<DiffuserBlock> DIFFUSER_BLOCK = REGISTRATE
+            .block("diffuser", DiffuserBlock::new)
+            .initialProperties(() -> Blocks.IRON_BLOCK)
+            .properties(p -> p.noOcclusion())
+            .properties(p -> p.sound(SoundType.LANTERN))
+            .blockstate(
+                    (c, p) -> p.directionalBlock(c.get(), p.models().getExistingFile(p.modLoc("block/diffuser.json"))))
+            .simpleItem()
+            .register();
+
+    public static final BlockEntityEntry<DiffuserBlockEntity> DIFFUSER_BE = Diffuser.REGISTRATE
+            .blockEntity("diffuser", DiffuserBlockEntity::new)
+            .validBlocks(DIFFUSER_BLOCK)
+            .register();
+
     public Diffuser() {
 
-
-        // This is our mod's event bus, used for things like registry or lifecycle events
         IEventBus MOD_BUS = FMLJavaModLoadingContext.get().getModEventBus();
-
-        ModBlocks.register();
-        ModBlockEntities.register();
-        ModCreativeModeTabs.register(MOD_BUS);
-        
-        // This listener is fired on both client and server during setup.
-        // MOD_BUS.addListener(this::commonSetup);
-        // This listener is only fired during client setup, so we can use client-side methods here.
-        // MOD_BUS.addListener(this::clientSetup);
-        
-        // Most other events are fired on Forge's bus.
-        // If we want to use annotations to register event listeners,
-        // we need to register our object like this!
+        CreativeModeTabs.register(MOD_BUS);
         MinecraftForge.EVENT_BUS.register(this);
-        
-        // For more information on how to deal with events in Forge,
-        // like automatically subscribing an entire class to an event bus
-        // or using static methods to listen to events,
-        // feel free to check out the Forge wiki!
     }
-
-    // private void commonSetup(final FMLCommonSetupEvent event) {
-    //     LOGGER.info("Hello from common setup! This is *after* registries are done, so we can do this:");
-    //     LOGGER.info("Look, I found a {}!", Items.DIAMOND);
-    // }
-
-    // private void clientSetup(final FMLClientSetupEvent event) {
-    //     LOGGER.info("Hey, we're on Minecraft version {}!", Minecraft.getInstance().getLaunchedVersion());
-    // }
-
-    // @SubscribeEvent
-    // public void kaboom(ExplosionEvent.Detonate event) {
-    //     LOGGER.info("Kaboom! Something just blew up in {}!", event.getLevel());
-    // }
 }
