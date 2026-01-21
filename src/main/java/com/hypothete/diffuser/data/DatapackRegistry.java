@@ -13,7 +13,7 @@ public class DatapackRegistry {
 	@SubscribeEvent
 	public static void registerDatapackRegistries(DataPackRegistryEvent.NewRegistry event) {
 		event.dataPackRegistry(
-			FluidEffectManager.FLUID_EFFECTS_KEY,
+			FluidEffect.FLUID_EFFECTS_KEY,
 			FluidEffect.CODEC,
 			FluidEffect.CODEC
 		);

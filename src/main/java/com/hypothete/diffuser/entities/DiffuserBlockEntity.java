@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import com.hypothete.diffuser.blocks.DiffuserBlock;
 import com.hypothete.diffuser.data.FluidEffect;
-import com.hypothete.diffuser.data.FluidEffectManager;
 import com.hypothete.diffuser.effects.CustomFluidEffectHandler;
 import com.simibubi.create.api.effect.OpenPipeEffectHandler;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
@@ -93,16 +92,13 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
       var foundFluidEffect = getFluidEffect(currentFluid);
       if (foundFluidEffect.isPresent()) {
         customEffectHandler.apply(level, aoe, foundFluidEffect.get());
-        return;
+      } else {
+        // fall back on open pipe behavior
+        OpenPipeEffectHandler effectHandler = OpenPipeEffectHandler.REGISTRY.get(currentFluid);
+        if (effectHandler != null) {
+          effectHandler.apply(level, aoe, currentFluidInTank);
+        }
       }
-
-      // fall back on open pipe behavior
-      OpenPipeEffectHandler effectHandler = OpenPipeEffectHandler.REGISTRY.get(currentFluid);
-      if (effectHandler == null) {
-        return;
-      }
-
-      effectHandler.apply(level, aoe, currentFluidInTank);
 
       if (!tank.isEmpty()) {
         tank.getPrimaryHandler().drain(5, FluidAction.EXECUTE);
@@ -114,7 +110,7 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
   public Optional<FluidEffect> getFluidEffect(Fluid fluid) {
     return level.registryAccess()
-        .lookupOrThrow(FluidEffectManager.FLUID_EFFECTS_KEY)
+        .lookupOrThrow(FluidEffect.FLUID_EFFECTS_KEY)
         .listElements()
         .filter(ref -> ref.value().fluid().equals(fluid))
         .findFirst().map(ref -> ref.value());
@@ -131,10 +127,10 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
   protected void spawnDiffusingParticles(FluidStack fluid) {
     if (isVirtual() || fluid.isEmpty())
       return;
-    
+
     Vec3 startPos = VecHelper.getCenterOf(worldPosition);
     var facing = new Vec3(getBlockState().getValue(DiffuserBlock.FACING).step());
-    startPos = startPos.add(facing.scale(12 /16f)); // block model is 3/4 of a block tall
+    startPos = startPos.add(facing.scale(12 / 16f)); // block model is 3/4 of a block tall
     Vec3 offset = VecHelper.offsetRandomly(Vec3.ZERO, r, 1).normalize();
     var dot = offset.dot(facing);
     ParticleOptions particle = ParticleTypes.POOF;
@@ -142,7 +138,8 @@ public class DiffuserBlockEntity extends SmartBlockEntity implements IHaveGoggle
       particle = FluidFX.getFluidParticle(fluid);
     }
     Vec3 particleMotion = offset.scale(dot * 0.5); // slow it down a titch
-    level.addAlwaysVisibleParticle(particle, startPos.x, startPos.y, startPos.z, particleMotion.x, particleMotion.y, particleMotion.z);
+    level.addAlwaysVisibleParticle(particle, startPos.x, startPos.y, startPos.z, particleMotion.x, particleMotion.y,
+        particleMotion.z);
 
   }
 

@@ -1,14 +1,21 @@
 package com.hypothete.diffuser.data;
 
+import com.hypothete.diffuser.Diffuser;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public record FluidEffect (Fluid fluid, MobEffect effect) {
+
+  public static final ResourceKey<Registry<FluidEffect>> FLUID_EFFECTS_KEY = ResourceKey
+                        .createRegistryKey(ResourceLocation.fromNamespaceAndPath(Diffuser.MOD_ID, "fluid_effect"));
   
   public static final Codec<FluidEffect> CODEC = RecordCodecBuilder.create(i -> i.group(
     ForgeRegistries.FLUIDS.getCodec().fieldOf("fluid").forGetter(FluidEffect::fluid),
